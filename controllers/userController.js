@@ -1,6 +1,9 @@
 const router = require('express').Router();
+const express = require('express');
+const User = require('./../models/userModel');
 
-const user = require('../models/userModel');
+router.use(express.urlencoded({ extended: true }));
+router.use(express.json());
 
 router.all('/', (req, res) => {
     return res.json({
@@ -8,3 +11,4 @@ router.all('/', (req, res) => {
         message: 'User controller is working properly...'
     });
 })
+module.exports = router;

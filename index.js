@@ -1,19 +1,18 @@
 require('dotenv').config();
-const expressjs = require('express');
-const morganDev = require('morgan');
+const express = require('express');
+const morgan = require('morgan');
 const port = process.env.PORT;
-const corsDev = require('cors');
-// const db = require('./data/database')
+const cors = require('cors');
+ 
+const server = express();
+
 // Above are required packages import //
+const database=require('./database');
+const userController=require('./controllers/userController');
 
-
-const server = expressjs();
-
-server.use(morganDev('dev'));
-server.use(corsDev());
-server.use(expressjs.urlencoded({ extended: true }));
-server.use(expressjs.json());
-
+server.use(morgan('dev'));
+server.use(cors());
+server.use('/api/user', userController);
 server.all('/',
     (req, res) => {
         return res.json({
