@@ -12,7 +12,7 @@ router.all('/', (req, res) => {
     });
 })
 
-router.get('/userLogin', (req, res) => {
+router.post('/userLogin', (req, res) => {
     User.findOneAndUpdate(
         { email: req.body.email },
         { fcmToken: req.body.fcmToken },
