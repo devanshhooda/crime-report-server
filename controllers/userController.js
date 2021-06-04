@@ -2,9 +2,14 @@ const router = require('express').Router();
 const express = require('express');
 const User = require('./../models/userModel');
 const firebaseAdmin = require('firebase-admin');
+const serviceAccount = require('../fcmFile.json');
 
 router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
+
+firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert(serviceAccount),
+});
 
 router.all('/', (req, res) => {
     return res.json({
