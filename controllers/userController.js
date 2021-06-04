@@ -29,13 +29,17 @@ router.get('/userLogin', (req, res) => {
                 },
                     (createErr, createRes) => {
 
+                        // finally its error
                         if (createErr) {
                             return res.json({
                                 status: false,
                                 message: "User create / update error",
                                 err: createErr
                             });
-                        } else {
+                        }
+
+                        // user creation successfull
+                        else {
                             return res.json({
                                 status: false,
                                 message: "New user created",
@@ -48,7 +52,7 @@ router.get('/userLogin', (req, res) => {
                 );
             }
 
-            // user login
+            // user login and fcmToken updated
             else {
                 return res.json({
                     status: true,
