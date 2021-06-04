@@ -2,14 +2,14 @@ const mongooseDev = require('mongoose');
 
 const userSchema = mongooseDev.Schema({
 
-    phoneNumber: {
-        type: String,
-        required: true,
-    },
-
     email: {
         type: String,
         unique: true,
+        required: true,
+    },
+
+    phoneNumber: {
+        type: String,
     },
 
     fullName: {
