@@ -21,7 +21,7 @@ router.all('/', (req, res) => {
 router.post('/userSignUp',
     (req, res) => {
         User.create({
-            email: req.body.emailAddress,
+            emailAddress: req.body.emailAddress,
             phoneNumber: req.body.phoneNumber,
             fullName: req.body.fullName,
             fcmToken: req.body.fcmToken,
@@ -55,7 +55,7 @@ router.post('/userSignUp',
 router.post('/userLogin',
     (req, res) => {
         User.findOneAndUpdate(
-            { email: req.body.emailAddress },
+            { emailAddress: req.body.emailAddress },
             { fcmToken: req.body.fcmToken },
 
             (findErr, dbRes) => {
@@ -85,7 +85,7 @@ router.post('/sendCallRequest',
     (req, res) => {
 
         User.findOne(
-            { email: req.body.emailAddress },
+            { emailAddress: req.body.emailAddress },
 
             (findErr, dbRes) => {
 
@@ -99,14 +99,10 @@ router.post('/sendCallRequest',
 
                 } else {
 
-                    sendFCM_notification(dbRes.fcmToken, dbRes.fullName, req.body.mqttTopic).catch((fcmErr) => {
-                        console.log(Date.now(), ': Error sending fcm notification.', err);
-                        return res.json({
-                            status: false,
-                            message: 'Error sending fcm notification',
-                            error: fcmErr
-                        });
-                    });
+                    var token = dbRes.fcmToken;
+                    console.log('fcamToken : ' + fcmToken);
+
+                    sendFCM_notification(token, dbRes.fullName, req.body.mqttTopic);
 
                     return res.json({
                         status: true,
@@ -145,7 +141,14 @@ function sendFCM_notification(fcmToken, fullName, mqttTopic) {
             message: 'Notification sent',
             result: resp
         });
-    });
+    }).catch((fcmErr) => {
+        console.log(Date.now(), ': Error sending fcm notification.', err);
+        return res.json({
+            status: false,
+            message: 'Error sending fcm notification',
+            error: fcmErr
+        });
+    });;
 }
 
 module.exports = router;
