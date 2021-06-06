@@ -21,10 +21,11 @@ router.all('/', (req, res) => {
 router.post('/userSignUp',
     (req, res) => {
         User.create({
-            email: req.body.email,
+            email: req.body.emailAddress,
             phoneNumber: req.body.phoneNumber,
             fullName: req.body.fullName,
-            fcmToken: req.body.fcmToken
+            fcmToken: req.body.fcmToken,
+            googleId: req.body.googleId
         },
             (createErr, createRes) => {
 
@@ -54,7 +55,7 @@ router.post('/userSignUp',
 router.post('/userLogin',
     (req, res) => {
         User.findOneAndUpdate(
-            { email: req.body.email },
+            { email: req.body.emailAddress },
             { fcmToken: req.body.fcmToken },
 
             (findErr, dbRes) => {
@@ -80,40 +81,11 @@ router.post('/userLogin',
             });
     });
 
-router.post('/userLogin',
-    (req, res) => {
-        User.findOneAndUpdate(
-            { email: req.body.email },
-            { fcmToken: req.body.fcmToken },
-
-            (findErr, dbRes) => {
-
-                if (findErr) {
-
-                    return res.json({
-                        status: false,
-                        message: "User login error",
-                        err: findErr
-                    });
-
-                } else {
-
-                    return res.json({
-                        status: true,
-                        message: "User login successful",
-                        result: dbRes
-                    });
-
-                }
-
-            });
-    });
-
 router.post('/sendCallRequest',
     (req, res) => {
 
         User.findOne(
-            { email: req.body.email },
+            { email: req.body.emailAddress },
 
             (findErr, dbRes) => {
 
@@ -127,7 +99,14 @@ router.post('/sendCallRequest',
 
                 } else {
 
-                    sendFCM_notification(dbRes.fcmToken, dbRes.fullName, req.body.mqttTopic);
+                    sendFCM_notification(dbRes.fcmToken, dbRes.fullName, req.body.mqttTopic).catch((fcmErr) => {
+                        console.log(Date.now(), ': Error sending fcm notification.', err);
+                        return res.json({
+                            status: false,
+                            message: 'Error sending fcm notification',
+                            error: fcmErr
+                        });
+                    });
 
                     return res.json({
                         status: true,
@@ -165,13 +144,6 @@ function sendFCM_notification(fcmToken, fullName, mqttTopic) {
             status: true,
             message: 'Notification sent',
             result: resp
-        });
-    }).catch((notifErr) => {
-        console.log(Date.now(), ': Error sending fcm notification.', err);
-        return res.json({
-            status: false,
-            message: 'Error sending fcm notification',
-            error: notifErr
         });
     });
 }

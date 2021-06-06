@@ -2,7 +2,7 @@ const mongooseDev = require('mongoose');
 
 const userSchema = mongooseDev.Schema({
 
-    email: {
+    emailAddress: {
         type: String,
         unique: true,
         required: true,
@@ -19,6 +19,10 @@ const userSchema = mongooseDev.Schema({
     fcmToken: {
         type: String
     },
+
+    googleId: {
+        type: String
+    }
 
 });
 
