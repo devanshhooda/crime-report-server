@@ -7,7 +7,7 @@ const cors = require('cors');
 const server = express();
 
 // Above are required packages import //
-const database=require('./database');
+// const database=require('./database');
 const userController=require('./controllers/userController');
 
 server.use(morgan('dev'));

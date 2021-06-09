@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const express = require('express');
-const User = require('./../models/userModel');
+// const User = require('./../models/userModel');
 const firebaseAdmin = require('firebase-admin');
 const serviceAccount = require('../fcmFile.json');
 
@@ -18,110 +18,86 @@ router.all('/', (req, res) => {
     });
 })
 
-router.post('/userSignUp',
-    (req, res) => {
-        User.create({
-            emailAddress: req.body.emailAddress,
-            phoneNumber: req.body.phoneNumber,
-            fullName: req.body.fullName,
-            fcmToken: req.body.fcmToken,
-            googleId: req.body.googleId
-        },
-            (createErr, createRes) => {
+// router.post('/userSignUp',
+//     (req, res) => {
+//         User.create({
+//             emailAddress: req.body.emailAddress,
+//             phoneNumber: req.body.phoneNumber,
+//             fullName: req.body.fullName,
+//             fcmToken: req.body.fcmToken,
+//             googleId: req.body.googleId
+//         },
+//             (createErr, createRes) => {
 
-                if (createErr) {
+//                 if (createErr) {
 
-                    return res.json({
-                        status: false,
-                        message: "User create / update error",
-                        err: createErr
-                    });
+//                     return res.json({
+//                         status: false,
+//                         message: "User create / update error",
+//                         err: createErr
+//                     });
 
-                } else {
+//                 } else {
 
-                    return res.json({
-                        status: true,
-                        message: "New user created",
-                        result: createRes
-                    });
+//                     return res.json({
+//                         status: true,
+//                         message: "New user created",
+//                         result: createRes
+//                     });
 
-                }
+//                 }
 
-            }
+//             }
 
-        );
-    });
+//         );
+//     });
 
-router.post('/userLogin',
-    (req, res) => {
-        User.findOneAndUpdate(
-            { emailAddress: req.body.emailAddress },
-            { fcmToken: req.body.fcmToken },
+// router.post('/userLogin',
+//     (req, res) => {
+//         User.findOneAndUpdate(
+//             { emailAddress: req.body.emailAddress },
+//             { fcmToken: req.body.fcmToken },
 
-            (findErr, dbRes) => {
+//             (findErr, dbRes) => {
 
-                if (findErr) {
+//                 if (findErr) {
 
-                    return res.json({
-                        status: false,
-                        message: "User create / update error",
-                        err: findErr
-                    });
+//                     return res.json({
+//                         status: false,
+//                         message: "User create / update error",
+//                         err: findErr
+//                     });
 
-                } else {
+//                 } else {
 
-                    return res.json({
-                        status: true,
-                        message: "DB update succesful / user loged in",
-                        result: dbRes
-                    });
+//                     return res.json({
+//                         status: true,
+//                         message: "DB update succesful / user loged in",
+//                         result: dbRes
+//                     });
 
-                }
+//                 }
 
-            });
-    });
+//             });
+//     });
 
 router.post('/sendCallRequest',
     (req, res) => {
 
-        User.findOne(
-            { emailAddress: req.body.emailAddress },
+        var fcmToken = req.body.fcmToken;
 
-            (findErr, dbRes) => {
+        console.log('fcmToken from request : ' + fcmToken);
 
-                if (findErr) {
-
-                    return res.json({
-                        status: false,
-                        message: "User login error",
-                        err: findErr
-                    });
-
-                } else {
-
-                    var token = dbRes.fcmToken;
-                    console.log('fcamToken : ' + fcmToken);
-
-                    sendFCM_notification(token, dbRes.fullName, req.body.mqttTopic);
-
-                    return res.json({
-                        status: true,
-                        message: "Call notif sent successfully",
-                        result: dbRes
-                    });
-
-                }
-
-            });
+        sendFCM_notification(fcmToken);
 
     }
 );
 
-function sendFCM_notification(fcmToken, fullName, mqttTopic) {
+function sendFCM_notification(fcmToken) {
     firebaseAdmin.messaging().send({
         notification: {
             title: 'Learn live connection request',
-            body: `${fullName} is calling`
+            body: 'Incomming call'
         },
         android: {
             notification: {
@@ -130,7 +106,6 @@ function sendFCM_notification(fcmToken, fullName, mqttTopic) {
             collapseKey: 'message',
         },
         data: {
-            mqttTopic: mqttTopic,
             click_action: 'FLUTTER_NOTIFICATION_CLICK'
         },
         token: fcmToken
