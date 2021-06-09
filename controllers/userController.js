@@ -83,12 +83,13 @@ router.all('/', (req, res) => {
 
 router.post('/sendCallRequest',
     (req, res) => {
-
+        console.log(req.body);
         var fcmToken = req.body.fcmToken;
 
         console.log('fcmToken from request : ' + fcmToken);
 
         sendFCM_notification(fcmToken);
+        return;
 
     }
 );
